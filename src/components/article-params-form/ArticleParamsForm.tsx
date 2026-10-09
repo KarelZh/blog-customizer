@@ -27,7 +27,7 @@ type ArticleParamsFormProps = {
 export const ArticleParamsForm = ({
   onApply,
 }: ArticleParamsFormProps): React.JSX.Element => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [fontFamily, setFontFamily] = useState(defaultArticleState.fontFamilyOption);
   const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
   const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
@@ -36,20 +36,16 @@ export const ArticleParamsForm = ({
   );
   const [contentWidth, setContentWidth] = useState(defaultArticleState.contentWidth);
 
-  const handleClickForm = (): void => {
-    if (open === false) {
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
+  const handleToggleSidebar = (): void => {
+    setIsSidebarOpen((prev) => !prev);
   };
 
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   useOutsideClickClose({
-    isOpen: open,
+    isOpen: isSidebarOpen,
     rootRef: sidebarRef,
-    onChange: setOpen,
+    onChange: setIsSidebarOpen,
   });
 
   const handleSubmit = (event: React.FormEvent): void => {
@@ -64,22 +60,24 @@ export const ArticleParamsForm = ({
     });
   };
 
+  const [radioGroupKey, setRadioGroupKey] = useState(0);
+
   const handleReset = (): void => {
     setFontFamily(defaultArticleState.fontFamilyOption);
     setFontSize(defaultArticleState.fontSizeOption);
     setFontColor(defaultArticleState.fontColor);
     setBackgroundColor(defaultArticleState.backgroundColor);
     setContentWidth(defaultArticleState.contentWidth);
-
     onApply(defaultArticleState);
+    setRadioGroupKey((prev) => prev + 1);
   };
 
   return (
     <>
-      <ArrowButton isOpen={open} onClick={handleClickForm} />
+      <ArrowButton isOpen={isSidebarOpen} onClick={handleToggleSidebar} />
       <aside
         ref={sidebarRef}
-        className={clsx(styles.container, { [styles.container_open]: open })}
+        className={clsx(styles.container, { [styles.container_open]: isSidebarOpen })}
       >
         <form className={styles.form} onSubmit={handleSubmit} onReset={handleReset}>
           <Text as="h2" size={31} weight={800} uppercase={true}>
@@ -92,7 +90,8 @@ export const ArticleParamsForm = ({
             options={fontFamilyOptions}
           />
           <RadioGroup
-            name="Font size"
+            key={radioGroupKey}
+            name="fontSize"
             options={fontSizeOptions}
             selected={fontSize}
             title="Размер шрифта"
