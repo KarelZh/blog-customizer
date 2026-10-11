@@ -16,6 +16,7 @@ import {
   backgroundColors,
   contentWidthArr,
   type ArticleStateType,
+  type OptionType,
 } from '../../constants/articleProps';
 
 import styles from './ArticleParamsForm.module.scss';
@@ -28,13 +29,20 @@ export const ArticleParamsForm = ({
   onApply,
 }: ArticleParamsFormProps): React.JSX.Element => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [fontFamily, setFontFamily] = useState(defaultArticleState.fontFamilyOption);
-  const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
-  const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
-  const [backgroundColor, setBackgroundColor] = useState(
-    defaultArticleState.backgroundColor
-  );
-  const [contentWidth, setContentWidth] = useState(defaultArticleState.contentWidth);
+  //const [fontFamily, setFontFamily] = useState(defaultArticleState.fontFamilyOption);
+  //const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
+  //const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
+  //const [backgroundColor, setBackgroundColor] = useState(
+  //  defaultArticleState.backgroundColor
+  //);
+  //const [contentWidth, setContentWidth] = useState(defaultArticleState.contentWidth);
+
+  const [formState, setFormState] = useState<ArticleStateType>(defaultArticleState);
+  const handleChange =
+    (key: keyof ArticleStateType) =>
+    (option: OptionType): void => {
+      setFormState((prev) => ({ ...prev, [key]: option }));
+    };
 
   const handleToggleSidebar = (): void => {
     setIsSidebarOpen((prev) => !prev);
@@ -52,22 +60,18 @@ export const ArticleParamsForm = ({
     event.preventDefault();
 
     onApply({
-      fontFamilyOption: fontFamily,
-      fontSizeOption: fontSize,
-      fontColor: fontColor,
-      backgroundColor: backgroundColor,
-      contentWidth: contentWidth,
+      fontFamilyOption: formState.fontFamilyOption,
+      fontSizeOption: formState.fontSizeOption,
+      fontColor: formState.fontColor,
+      backgroundColor: formState.backgroundColor,
+      contentWidth: formState.contentWidth,
     });
   };
 
   const [radioGroupKey, setRadioGroupKey] = useState(0);
 
   const handleReset = (): void => {
-    setFontFamily(defaultArticleState.fontFamilyOption);
-    setFontSize(defaultArticleState.fontSizeOption);
-    setFontColor(defaultArticleState.fontColor);
-    setBackgroundColor(defaultArticleState.backgroundColor);
-    setContentWidth(defaultArticleState.contentWidth);
+    setFormState(defaultArticleState);
     onApply(defaultArticleState);
     setRadioGroupKey((prev) => prev + 1);
   };
@@ -84,37 +88,37 @@ export const ArticleParamsForm = ({
             Задайте параметры
           </Text>
           <Select
-            onChange={setFontFamily}
+            selected={formState.fontFamilyOption}
+            onChange={handleChange('fontFamilyOption')}
             title="Шрифт"
-            selected={fontFamily}
             options={fontFamilyOptions}
           />
           <RadioGroup
             key={radioGroupKey}
             name="fontSize"
             options={fontSizeOptions}
-            selected={fontSize}
+            selected={formState.fontSizeOption}
             title="Размер шрифта"
-            onChange={setFontSize}
+            onChange={handleChange('fontSizeOption')}
           />
           <Select
             title="Цвет шрифта"
-            selected={fontColor}
+            selected={formState.fontColor}
             options={fontColors}
-            onChange={setFontColor}
+            onChange={handleChange('fontColor')}
           />
           <Separator />
           <Select
             title="Цвет фона"
-            selected={backgroundColor}
+            selected={formState.backgroundColor}
             options={backgroundColors}
-            onChange={setBackgroundColor}
+            onChange={handleChange('backgroundColor')}
           />
           <Select
             title="Ширина контента"
-            selected={contentWidth}
+            selected={formState.contentWidth}
             options={contentWidthArr}
-            onChange={setContentWidth}
+            onChange={handleChange('contentWidth')}
           />
           <div className={styles.bottomContainer}>
             <Button title="Сбросить" htmlType="reset" type="clear" />
